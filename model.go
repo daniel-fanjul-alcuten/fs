@@ -176,7 +176,7 @@ func (m Model) CheckFuncs() (funcs map[string]func() error) {
 	return
 }
 
-func (m Model) DepFuncs(r bool, f func(n string, d Device) error) (funcs map[string]func() error) {
+func (m Model) DepFuncs(op string, r bool, f func(n string, d Device) error) (funcs map[string]func() error) {
 	direct, reverse := m.Deps()
 	if r {
 		direct, reverse = reverse, nil
@@ -202,7 +202,7 @@ func (m Model) DepFuncs(r bool, f func(n string, d Device) error) (funcs map[str
 					cond.Wait()
 				}
 				if err = states[d].err; err != nil {
-					err = fmt.Errorf("mount %v: %v", n, err)
+					err = fmt.Errorf("%v %v: %v", op, n, err)
 					states[n].work = true
 					states[n].done = true
 					states[n].err = err
@@ -234,7 +234,7 @@ func (m Model) DepFuncs(r bool, f func(n string, d Device) error) (funcs map[str
 }
 
 func (m Model) MountFuncs() (funcs map[string]func() error) {
-	return m.DepFuncs(false, func(n string, d Device) (err error) {
+	return m.DepFuncs("mount", false, func(n string, d Device) (err error) {
 		var ok error
 		if ok, err = d.Run(d.Commands.Check, false); err != nil {
 			return
@@ -254,7 +254,7 @@ func (m Model) MountFuncs() (funcs map[string]func() error) {
 }
 
 func (m Model) UmountFuncs() (funcs map[string]func() error) {
-	return m.DepFuncs(true, func(n string, d Device) (err error) {
+	return m.DepFuncs("umount", true, func(n string, d Device) (err error) {
 		var ok error
 		if ok, err = d.Run(d.Commands.Check, false); err != nil {
 			return
