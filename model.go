@@ -72,7 +72,7 @@ func Parse(fn string) (m Model, err error) {
 	var reader io.Reader
 	if strings.HasSuffix(fn, ".gpg") {
 		output := &bytes.Buffer{}
-		cmd := exec.Command("gpg", "--batch", "-d", fn)
+		cmd := exec.Command("gpg2", "--batch", "-d", fn)
 		PrintCommand(cmd)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = output
